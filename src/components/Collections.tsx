@@ -373,7 +373,7 @@ const Collections = ({ adminAuth }: { adminAuth?: any }) => {
     }
   };
 
-  // Delete product using DELETE API endpoint - FIXED URL
+  // Delete product using DELETE API endpoint
   const handleDelete = async (productId: string) => {
     if (!isAdmin()) {
       setError('Only administrators can delete products.');
@@ -699,6 +699,23 @@ const Collections = ({ adminAuth }: { adminAuth?: any }) => {
                       disabled={isSubmitting}
                     />
                     <label className="absolute text-lg text-amber-600 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-amber-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-4">
+                      Price (₹) *
+                    </label>
+                  </div>
+
+                  <div className="relative">
+                    <input
+                      type="number"
+                      placeholder=" "
+                      value={newAttar.rating}
+                      onChange={(e) => setNewAttar(prev => ({ ...prev, rating: e.target.value }))}
+                      className="w-full px-6 py-4 text-lg rounded-xl border-2 border-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent peer"
+                      min="0"
+                      max="5"
+                      step="0.1"
+                      disabled={isSubmitting}
+                    />
+                    <label className="absolute text-lg text-amber-600 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-amber-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-4">
                       Rating (0-5)
                     </label>
                   </div>
@@ -835,7 +852,7 @@ const Collections = ({ adminAuth }: { adminAuth?: any }) => {
                     {product.imageUrl ? (
                       <>
                         <img
-                          src={`https://perfumebackend-cn5i.onrender.com${product.imageUrl}`}
+                        src={`https://perfumebackend-cn5i.onrender.com${product.imageUrl}`}
                           alt={product.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {
