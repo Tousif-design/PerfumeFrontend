@@ -486,15 +486,62 @@ const Collections = ({ adminAuth }: { adminAuth?: any }) => {
     return stars;
   };
 
-  // Handle image error with fallback
+  // FIXED: Improved image URL construction and error handling
+  const getImageUrl = (imageUrl: string | null | undefined): string => {
+    if (!imageUrl) {
+      return '/assets/placeholder.jpg';
+    }
+
+    // If it's already a full URL, return as is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+
+    // If it starts with /uploads, construct the full URL
+    if (imageUrl.startsWith('/uploads/')) {
+      return `https://perfumebackend-cn5i.onrender.com${imageUrl}`;
+    }
+
+    // If it starts with uploads/, add the leading slash and construct URL
+    if (imageUrl.startsWith('uploads/')) {
+      return `https://perfumebackend-cn5i.onrender.com/${imageUrl}`;
+    }
+
+    // If it's just a filename, assume it's in uploads folder
+    return `https://perfumebackend-cn5i.onrender.com/uploads/${imageUrl}`;
+  };
+
+  // FIXED: Enhanced image error handler with proper fallback
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;
-    console.log('Image failed to load:', target.src);
-    target.style.display = 'none';
-    const fallback = target.parentElement?.querySelector('.image-fallback') as HTMLElement;
-    if (fallback) {
-      fallback.style.display = 'flex';
+    const originalSrc = target.src;
+    
+    console.log('Image failed to load:', originalSrc);
+    
+    // Don't retry if it's already the placeholder
+    if (originalSrc.includes('placeholder.jpg')) {
+      console.log('Placeholder image also failed, showing Upload icon');
+      target.style.display = 'none';
+      const fallback = target.parentElement?.querySelector('.image-fallback') as HTMLElement;
+      if (fallback) {
+        fallback.style.display = 'flex';
+      }
+      return;
     }
+
+    // Try to use placeholder image
+    console.log('Switching to placeholder image');
+    target.src = '/assets/placeholder.jpg';
+    
+    // If placeholder also fails, show the Upload icon
+    target.onerror = () => {
+      console.log('Placeholder image not available, showing Upload icon');
+      target.style.display = 'none';
+      const fallback = target.parentElement?.querySelector('.image-fallback') as HTMLElement;
+      if (fallback) {
+        fallback.style.display = 'flex';
+      }
+    };
   };
 
   useEffect(() => {
@@ -825,6 +872,9 @@ const Collections = ({ adminAuth }: { adminAuth?: any }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {products.map((product) => {
                 console.log(`Rendering product: ${product.title}, imageUrl: ${product.imageUrl}`);
+                const imageUrl = getImageUrl(product.imageUrl);
+                console.log(`Constructed image URL for ${product.title}: ${imageUrl}`);
+                
                 return (
                   <div
                     key={product._id}
@@ -849,28 +899,18 @@ const Collections = ({ adminAuth }: { adminAuth?: any }) => {
 
                   {/* Product Image with improved cross-browser handling */}
                   <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
-                    {product.imageUrl ? (
-                      <>
-                        <img
-                        src={`https://perfumebackend-cn5i.onrender.com${product.imageUrl}`}
-                          alt={product.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            console.error('Image failed to load:', (e.target as HTMLImageElement).src);
-                            handleImageError(e);
-                          }}
-                          onLoad={() => console.log('Image loaded successfully:', product.title)}
-                          loading="lazy"
-                        />
-                        <div className="image-fallback absolute inset-0 flex items-center justify-center" style={{display: 'none'}}>
-                          <Upload size={48} className="text-gray-400" />
-                        </div>
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Upload size={48} className="text-gray-400" />
-                      </div>
-                    )}
+                    <img
+                      src={imageUrl}
+                      alt={product.title}
+                      className="w-full h-full object-cover transition-opacity duration-300"
+                      onError={handleImageError}
+                      onLoad={() => console.log('Image loaded successfully:', product.title)}
+                      loading="lazy"
+                    />
+                    <div className="image-fallback absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200" style={{display: 'none'}}>
+                      <Upload size={48} className="text-gray-400 mb-2" />
+                      <span className="text-gray-500 text-sm text-center px-2">No Image Available</span>
+                    </div>
                   </div>
 
                   {/* Product Info */}
