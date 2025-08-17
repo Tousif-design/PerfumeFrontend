@@ -167,7 +167,7 @@ const Collections = ({ adminAuth }: { adminAuth?: any }) => {
       setIsLoading(true);
       setError('');
       
-      const response = await fetch('https://perfumebackend-cn5i.onrender.com/api/products', {
+      const response = await fetch('http://localhost:5000/api/products', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -246,7 +246,7 @@ const Collections = ({ adminAuth }: { adminAuth?: any }) => {
       imageUrl: imageBase64 ? `base64_data_present_${imageBase64.substring(0, 50)}...` : 'no_image' 
     });
     
-    const response = await fetch('https://perfumebackend-cn5i.onrender.com/api/products', {
+    const response = await fetch('http://localhost:5000/api/products', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -385,7 +385,7 @@ const Collections = ({ adminAuth }: { adminAuth?: any }) => {
     try {
       const token = getAuthToken();
       
-      const response = await fetch(`https://perfumebackend-cn5i.onrender.com/api/products/${productId}`, {
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
